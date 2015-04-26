@@ -19,11 +19,71 @@ knit        : slidify::knit2slides
 
 --- .class #id 
 
+## Why is this application useful?
+
+1. The data on the AsianBondsOnline website is not very well formatted. Further, the data is not actually in xls format despite it being downloaded as such.
+2. The data is best read in html format. This is what this application helps to do.
+3. Furthermore, the data is not very clean. This application helps to clean it.
+
 ## What does the user need to do?
 
 1. Simply select the Country, Entity type and Currency of choice.
 2. Enter submit.
 2. Viola, the application will draw the data and plot automatically.
+
+--- .class #id
+
+## Example of the code used to download the data.
+
+
+
+```r
+dat<-readHTMLTable("http://asianbondsonline.adb.org/spreadsheets/RG-LCY_Bond_Market_USD.xls")
+dat<-data.frame(dat)
+names(dat)<-gsub("NULL.","",names(dat))
+
+for (i in 3:ncol(dat)) {
+        dat[,i]<-as.character(dat[,i])
+        dat[,i]<-as.numeric(dat[,i])
+}
+
+dat$Date<-as.Date(as.yearmon(dat$Date))
+
+dat<-melt(dat,id.vars=c("Date","Market"),variable.name="Entity")
+
+dat$Currency<-rep("USD",nrow(dat))
+
+dat$Currency[grep("LCY",dat$Entity)]<-"LCY"
+
+dat$Entity<-as.character(dat$Entity)
+
+dat$Entity[grep("Government",dat$Entity)]<-"Government"
+
+dat$Entity[grep("Corporate",dat$Entity)]<-"Corporate"
+
+dat$Entity[grep("Total",dat$Entity)]<-"Total"
+
+summary(dat)
+```
+
+```
+##       Date                Market        Entity         
+##  Min.   :1995-03-01   HK     : 480   Length:3786       
+##  1st Qu.:2002-09-01   KR     : 480   Class :character  
+##  Median :2007-03-01   TH     : 480   Mode  :character  
+##  Mean   :2006-09-24   CN     : 426                     
+##  3rd Qu.:2011-03-01   JP     : 408                     
+##  Max.   :2015-03-01   VN     : 360                     
+##                       (Other):1152                     
+##      value             Currency        
+##  Min.   :      0.0   Length:3786       
+##  1st Qu.:     65.6   Class :character  
+##  Median :    347.3   Mode  :character  
+##  Mean   :  90310.4                     
+##  3rd Qu.:   4695.5                     
+##  Max.   :1857738.9                     
+## 
+```
 
 --- .class #id
 

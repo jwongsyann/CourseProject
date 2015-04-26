@@ -58,14 +58,77 @@
 
 <slide class="class" id="id" style="background:;">
   <hgroup>
-    <h2>What does the user need to do?</h2>
+    <h2>Why is this application useful?</h2>
   </hgroup>
   <article data-timings="">
     <ol>
+<li>The data on the AsianBondsOnline website is not very well formatted. Further, the data is not actually in xls format despite it being downloaded as such.</li>
+<li>The data is best read in html format. This is what this application helps to do.</li>
+<li>Furthermore, the data is not very clean. This application helps to clean it.</li>
+</ol>
+
+<h2>What does the user need to do?</h2>
+
+<ol>
 <li>Simply select the Country, Entity type and Currency of choice.</li>
 <li>Enter submit.</li>
 <li>Viola, the application will draw the data and plot automatically.</li>
 </ol>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id" style="background:;">
+  <hgroup>
+    <h2>Example of the code used to download the data.</h2>
+  </hgroup>
+  <article data-timings="">
+    <pre><code class="r">dat&lt;-readHTMLTable(&quot;http://asianbondsonline.adb.org/spreadsheets/RG-LCY_Bond_Market_USD.xls&quot;)
+dat&lt;-data.frame(dat)
+names(dat)&lt;-gsub(&quot;NULL.&quot;,&quot;&quot;,names(dat))
+
+for (i in 3:ncol(dat)) {
+        dat[,i]&lt;-as.character(dat[,i])
+        dat[,i]&lt;-as.numeric(dat[,i])
+}
+
+dat$Date&lt;-as.Date(as.yearmon(dat$Date))
+
+dat&lt;-melt(dat,id.vars=c(&quot;Date&quot;,&quot;Market&quot;),variable.name=&quot;Entity&quot;)
+
+dat$Currency&lt;-rep(&quot;USD&quot;,nrow(dat))
+
+dat$Currency[grep(&quot;LCY&quot;,dat$Entity)]&lt;-&quot;LCY&quot;
+
+dat$Entity&lt;-as.character(dat$Entity)
+
+dat$Entity[grep(&quot;Government&quot;,dat$Entity)]&lt;-&quot;Government&quot;
+
+dat$Entity[grep(&quot;Corporate&quot;,dat$Entity)]&lt;-&quot;Corporate&quot;
+
+dat$Entity[grep(&quot;Total&quot;,dat$Entity)]&lt;-&quot;Total&quot;
+
+summary(dat)
+</code></pre>
+
+<pre><code>##       Date                Market        Entity         
+##  Min.   :1995-03-01   HK     : 480   Length:3786       
+##  1st Qu.:2002-09-01   KR     : 480   Class :character  
+##  Median :2007-03-01   TH     : 480   Mode  :character  
+##  Mean   :2006-09-24   CN     : 426                     
+##  3rd Qu.:2011-03-01   JP     : 408                     
+##  Max.   :2015-03-01   VN     : 360                     
+##                       (Other):1152                     
+##      value             Currency        
+##  Min.   :      0.0   Length:3786       
+##  1st Qu.:     65.6   Class :character  
+##  Median :    347.3   Mode  :character  
+##  Mean   :  90310.4                     
+##  3rd Qu.:   4695.5                     
+##  Max.   :1857738.9                     
+## 
+</code></pre>
 
   </article>
   <!-- Presenter Notes -->
@@ -96,14 +159,20 @@
     </li>
     <li>
       <a href="#" target="_self" rel='tooltip' 
-        data-slide=2 title='What does the user need to do?'>
+        data-slide=2 title='Why is this application useful?'>
          2
       </a>
     </li>
     <li>
       <a href="#" target="_self" rel='tooltip' 
-        data-slide=3 title='Credits'>
+        data-slide=3 title='Example of the code used to download the data.'>
          3
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=4 title='Credits'>
+         4
       </a>
     </li>
   </ul>
